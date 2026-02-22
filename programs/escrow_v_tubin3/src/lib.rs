@@ -1,13 +1,16 @@
 use anchor_lang::prelude::*;
 
-pub use constants::*;
+pub mod constants;
+pub mod instructions;
+pub mod state;
+
 pub use instructions::*;
 pub use state::*;
 
 declare_id!("AtgfV9JbP4BWByEiwbYNbZKu8ztq7M7SshBPnCcY8Rt5");
 
 #[program]
-pub mod escrow_testing {
+pub mod escrow_v_tubin3 {
     use super::*;
 
     pub fn make(ctx: Context<Make>, seed: u64, deposit: u64, receive: u64) -> Result<()> {

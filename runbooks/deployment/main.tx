@@ -1,0 +1,15 @@
+################################################################
+# Manage escrow_v_tubin3 deployment through Crypto Infrastructure as Code
+################################################################
+
+addon "svm" {
+    rpc_api_url = input.rpc_api_url
+    network_id = input.network_id
+}
+
+action "deploy_escrow_v_tubin3" "svm::deploy_program" {
+    description = "Deploy escrow_v_tubin3 program"
+    program = svm::get_program_from_anchor_project("escrow_v_tubin3") 
+    authority = signer.authority
+    payer = signer.payer
+}

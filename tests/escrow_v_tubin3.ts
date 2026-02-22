@@ -1,7 +1,7 @@
 
 import * as anchor from "@coral-xyz/anchor";
 import { Program, BN } from "@coral-xyz/anchor";
-import { EscrowVTurbin3 } from "../target/types/escrow_v_turbin3";
+import { EscrowVTubin3 } from "../target/types/escrow_v_tubin3";
 import {
   createMint,
   createAssociatedTokenAccount,
@@ -15,15 +15,17 @@ import {
   PublicKey,
   LAMPORTS_PER_SOL,
   ConfirmOptions,
+  SystemProgram,
+  Transaction,
 } from "@solana/web3.js";
 import { expect } from "chai";
 
 const confirmOpts: ConfirmOptions = { commitment: "confirmed" };
 
-describe("escrow_v_turbin3", () => {
+describe("escrow_v_tubin3", () => {
   const provider = anchor.AnchorProvider.env();
   anchor.setProvider(provider);
-  const program = anchor.workspace.escrowVTurbin3 as Program<EscrowVTurbin3>;
+  const program = anchor.workspace.escrowVTubin3 as Program<EscrowVTubin3>;
   const connection = provider.connection;
 
   const maker = Keypair.generate();
@@ -39,12 +41,14 @@ describe("escrow_v_turbin3", () => {
   const decimals = 6;
 
   async function airdrop(to: PublicKey, amount: number) {
-    const latestBlockhash = await connection.getLatestBlockhash();
-    const sig = await connection.requestAirdrop(to, amount);
-    await connection.confirmTransaction(
-      { signature: sig, ...latestBlockhash },
-      "confirmed"
+    const tx = new Transaction().add(
+      SystemProgram.transfer({
+        fromPubkey: provider.wallet.publicKey,
+        toPubkey: to,
+        lamports: amount,
+      })
     );
+    await provider.sendAndConfirm(tx, [], confirmOpts);
   }
 
   function getEscrowPda(makerKey: PublicKey, escrowSeed: BN): PublicKey {
@@ -63,8 +67,8 @@ describe("escrow_v_turbin3", () => {
   }
 
   before(async () => {
-    await airdrop(maker.publicKey, 10 * LAMPORTS_PER_SOL);
-    await airdrop(taker.publicKey, 10 * LAMPORTS_PER_SOL);
+    await airdrop(maker.publicKey, 2 * LAMPORTS_PER_SOL);
+    await airdrop(taker.publicKey, 2 * LAMPORTS_PER_SOL);
 
     mintA = await createMint(
       connection,
